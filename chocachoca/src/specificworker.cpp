@@ -71,20 +71,55 @@ void SpecificWorker::initialize(int period)
 
 void SpecificWorker::compute()
 {
-	//computeCODE
-	//QMutexLocker locker(mutex);
-	//try
-	//{
-	//  camera_proxy->getYImage(0,img, cState, bState);
-	//  memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-	//  searchTags(image_gray);
-	//}
-	//catch(const Ice::Exception &e)
-	//{
-	//  std::cout << "Error reading from Camera" << e << std::endl;
-	//}
-	
-	
+/*
+    const float threshold = 200; // millimeters
+    float rot = 0.6;  // rads per second
+*/
+    const float threshold = 200; // millimeters
+    float rot = 2;  // rads per second
+	int seg=0;
+    try
+    {
+    	// read laser data 
+        RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
+	//sort laser data from small to large distances using a lambda function.
+        std::sort( ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return     a.dist < b.dist; });  
+
+	if( ldata.front().dist < threshold)
+	{
+		std::cout << ldata.front().dist << std::endl;
+		std::cout << ldata.front().angle << std::endl;
+		if(ldata.front().dist< 50){
+			seg=1500000;
+		}
+		else if(ldata.front().dist< 100)
+		{
+			seg=1000000;
+		}
+		else if(ldata.front().dist< 150){
+			seg=500000;
+		}
+		else{
+			seg=250000;
+		}
+		if(ldata.front().angle < 0.5){
+			differentialrobot_proxy->setSpeedBase(3, rot);
+		}
+		else{
+			differentialrobot_proxy->setSpeedBase(3, -rot);
+		}
+		/*usleep(rand()%(250000-100000 + 1) + 100000);*/  // random wait between 1.5s and 0.1sec
+		usleep(seg);
+	}
+	else
+	{
+		differentialrobot_proxy->setSpeedBase(1000, 0); 
+  	}
+    }
+    catch(const Ice::Exception &ex)
+    {
+        std::cout << ex << std::endl;
+    }
 }
 
 int SpecificWorker::startup_check()
