@@ -29,6 +29,7 @@
 
 #include <genericworker.h>
 #include <innermodel/innermodel.h>
+#include <math.h>
 
 class SpecificWorker : public GenericWorker
 {
@@ -47,6 +48,8 @@ public slots:
 private:
 	std::shared_ptr < InnerModel > innerModel;
 	bool startup_check_flag;
+	bool giro=0;
+	int choques=0;
 
 };
 

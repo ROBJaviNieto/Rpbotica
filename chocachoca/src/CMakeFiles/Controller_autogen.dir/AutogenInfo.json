@@ -1,12 +1,37 @@
 {
-	"BUILD_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/Controller_autogen",
-	"CMAKE_BINARY_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca",
-	"CMAKE_CURRENT_BINARY_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca/src",
-	"CMAKE_CURRENT_SOURCE_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca/src",
+	"BUILD_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/Controller_autogen",
+	"CMAKE_BINARY_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
-	"CMAKE_SOURCE_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca",
+	"CMAKE_SOURCE_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca",
 	"HEADERS" : 
 	[
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/commonbehaviorI.h",
+			"MU",
+			"EWIEGA46WW/moc_commonbehaviorI.cpp"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/genericmonitor.h",
+			"MU",
+			"EWIEGA46WW/moc_genericmonitor.cpp"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/genericworker.h",
+			"MU",
+			"EWIEGA46WW/moc_genericworker.cpp"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/specificmonitor.h",
+			"MU",
+			"EWIEGA46WW/moc_specificmonitor.cpp"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/specificworker.h",
+			"MU",
+			"EWIEGA46WW/moc_specificworker.cpp"
+		],
 		[
 			"/home/ticoy/robocomp/classes/qlog/qlog.h",
 			"MU",
@@ -21,36 +46,11 @@
 			"/home/ticoy/robocomp/classes/sigwatch/sigwatch.h",
 			"MU",
 			"VGZGKFLYIA/moc_sigwatch.cpp"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/commonbehaviorI.h",
-			"MU",
-			"EWIEGA46WW/moc_commonbehaviorI.cpp"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/genericmonitor.h",
-			"MU",
-			"EWIEGA46WW/moc_genericmonitor.cpp"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/genericworker.h",
-			"MU",
-			"EWIEGA46WW/moc_genericworker.cpp"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/specificmonitor.h",
-			"MU",
-			"EWIEGA46WW/moc_specificmonitor.cpp"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/specificworker.h",
-			"MU",
-			"EWIEGA46WW/moc_specificworker.cpp"
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/Controller_autogen/include",
-	"MOC_COMPILATION_FILE" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/Controller_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/Controller_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/Controller_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"QT_CORE_LIB",
@@ -72,11 +72,11 @@
 	],
 	"MOC_INCLUDES" : 
 	[
-		"/home/ticoy/robotica-javi-nieto/chocachoca/src",
-		"/home/ticoy/robotica-javi-nieto/chocachoca/src",
+		"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src",
+		"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src",
 		"/opt/robocomp/include",
 		"/classes",
-		"/home/ticoy/robotica-javi-nieto/chocachoca",
+		"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca",
 		"/home/ticoy/robocomp/classes",
 		"/home/ticoy/robocomp/libs",
 		"/home/ticoy/robocomp/interfaces",
@@ -110,42 +110,45 @@
 		"-c",
 		"/usr/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp"
 	],
-	"MOC_PREDEFS_FILE" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/Controller_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/Controller_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 6,
-	"PARSE_CACHE_FILE" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/CMakeFiles/Controller_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/CMakeFiles/Controller_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
 	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
 	"QT_VERSION_MAJOR" : 5,
-	"SETTINGS_FILE" : "/home/ticoy/robotica-javi-nieto/chocachoca/src/CMakeFiles/Controller_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/CMakeFiles/Controller_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/commonbehaviorI.cpp",
+			"MU"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/genericmonitor.cpp",
+			"MU"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/genericworker.cpp",
+			"MU"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/main.cpp",
+			"MU"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/specificmonitor.cpp",
+			"MU"
+		],
+		[
+			"/home/ticoy/Escritorio/robotica-javi-nieto/chocachoca/src/specificworker.cpp",
+			"MU"
+		],
 		[ "/home/ticoy/robocomp/classes/qlog/qlog.cpp", "MU" ],
 		[ "/home/ticoy/robocomp/classes/rapplication/rapplication.cpp", "MU" ],
-		[ "/home/ticoy/robocomp/classes/sigwatch/sigwatch.cpp", "MU" ],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/commonbehaviorI.cpp",
-			"MU"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/genericmonitor.cpp",
-			"MU"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/genericworker.cpp",
-			"MU"
-		],
-		[ "/home/ticoy/robotica-javi-nieto/chocachoca/src/main.cpp", "MU" ],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/specificmonitor.cpp",
-			"MU"
-		],
-		[
-			"/home/ticoy/robotica-javi-nieto/chocachoca/src/specificworker.cpp",
-			"MU"
-		]
+		[ "/home/ticoy/robocomp/classes/sigwatch/sigwatch.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

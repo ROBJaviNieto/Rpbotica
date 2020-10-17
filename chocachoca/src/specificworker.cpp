@@ -75,21 +75,67 @@ void SpecificWorker::compute()
     const float threshold = 200; // millimeters
     float rot = 0.6;  // rads per second
 */
-    const float threshold = 200; // millimeters
-    float rot = 2;  // rads per second
-	int seg=0;
+    const float threshold = 150; // millimeters
+    float rot = M_PI/2;  // rads per second
+	int x=0,z=0;
+	float angle=0;
+	float seg=1000000;
     try
     {
     	// read laser data 
         RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
 	//sort laser data from small to large distances using a lambda function.
         std::sort( ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return     a.dist < b.dist; });  
-
+	differentialrobot_proxy->getBasePose(x,z,angle);
+	if(z==0 && x==0){
+		differentialrobot_proxy->setSpeedBase(5, rot);
+		usleep(seg);
+		differentialrobot_proxy->setSpeedBase(1000, 0);
+	}
+	if(z > 2100){
+		differentialrobot_proxy->setSpeedBase(0, 0);
+	}
+	else{
+	cout << "X = " << x << " Z = " << z << " angulo = " << angle << std::endl;
 	if( ldata.front().dist < threshold)
-	{
-		std::cout << ldata.front().dist << std::endl;
-		std::cout << ldata.front().angle << std::endl;
-		if(ldata.front().dist< 50){
+	{	choques++;
+		if(choques==1){
+			differentialrobot_proxy->setSpeedBase(100, rot);
+			usleep(seg);
+			differentialrobot_proxy->setSpeedBase(1000, 0);
+			usleep(seg); 
+		}
+		else if(choques==2){
+			differentialrobot_proxy->setSpeedBase(100, rot);
+			usleep(seg);
+			differentialrobot_proxy->setSpeedBase(1000, 0);
+			usleep(seg); 
+		}
+		else{
+		
+			if(!giro){
+				differentialrobot_proxy->setSpeedBase(100, rot);
+				usleep(seg);
+				differentialrobot_proxy->setSpeedBase(100, 0);
+				usleep(seg);
+				differentialrobot_proxy->setSpeedBase(100, rot);
+				usleep(seg);
+				giro=1;
+
+			}
+			else{
+				differentialrobot_proxy->setSpeedBase(100, -rot);
+				usleep(seg);
+				differentialrobot_proxy->setSpeedBase(100, 0);
+				usleep(seg);
+				differentialrobot_proxy->setSpeedBase(100, -rot);
+				usleep(seg);
+				giro=0;
+				
+			}
+		}
+
+		/*if(ldata.front().dist< 50){
 			seg=1500000;
 		}
 		else if(ldata.front().dist< 100)
@@ -108,13 +154,14 @@ void SpecificWorker::compute()
 		else{
 			differentialrobot_proxy->setSpeedBase(3, -rot);
 		}
-		/*usleep(rand()%(250000-100000 + 1) + 100000);*/  // random wait between 1.5s and 0.1sec
-		usleep(seg);
+		usleep(rand()%(250000-100000 + 1) + 100000);*/  // random wait between 1.5s and 0.1sec
+		//usleep(seg);
 	}
 	else
 	{
 		differentialrobot_proxy->setSpeedBase(1000, 0); 
   	}
+	}
     }
     catch(const Ice::Exception &ex)
     {
