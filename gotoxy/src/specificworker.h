@@ -30,6 +30,7 @@
 #include <genericworker.h>
 #include <innermodel/innermodel.h>
 #include <Eigen/Dense>
+#include <math.h>
 template <typename T>
 struct Target
 {
@@ -48,8 +49,7 @@ struct Target
   std::optional<T> get()
   {
     std::lock_guard<std::mutex> guard(mymutex);
-    if(activate && full){
-       full = false;
+    if(activate){
        return content;
     }else
        return {};
@@ -66,6 +66,29 @@ struct coordenada
    float x;
    float z;
 };
+struct recta
+{
+   float xt;
+   float zt;
+   float xr;
+   float zr;
+   float A(){
+      return zr-zt;
+   }
+   float B(){
+      return xt-xr;
+   }
+   float C(){
+     return -B()*zr-A()*xr;
+   }
+   float M(){
+      return (zt-zr)/(xt-xr);
+   }
+   float DistanciaPuntoARecta(float x, float z)
+   {
+      return fabs(A()*x + B()*z + C())/(sqrt(pow(A(),2)+pow(B(),2)));
+   }
+};
 class SpecificWorker : public GenericWorker
 {
 Q_OBJECT
@@ -81,10 +104,17 @@ public slots:
 	void compute();
 	int startup_check();
 	void initialize(int period);
+   void obstaculoEncontrado(RoboCompGenericBase::TBaseState bState);
+   void seguirPuntero(RoboCompGenericBase::TBaseState bState,coordenada target);
 private:
 	std::shared_ptr < InnerModel > innerModel;
+   recta algBug;
 	bool startup_check_flag;
+   bool obstaculo = false;
    bool click=false;
+   bool fueraRecta=false;
+   bool avance=true;
+
    Target <coordenada> objetivo;
 };
 

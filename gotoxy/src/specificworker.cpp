@@ -69,69 +69,84 @@ void SpecificWorker::initialize(int period)
 	}
 
 }
+void SpecificWorker::seguirPuntero(RoboCompGenericBase::TBaseState bState,coordenada target)
+{
+	Eigen:: Matrix2f rot;
+	rot<<cos(bState.alpha),-sin(bState.alpha),sin(bState.alpha),cos(bState.alpha);
+	RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
+	std::sort( ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return     a.dist < b.dist; }); 
+	Eigen:: Vector2f target2 (target.x,target.z);
+	Eigen:: Vector2f rw (bState.x,bState.z);
 
+	auto tr = rot*(target2-rw);
+	auto beta = atan2(tr[0],tr[1]);
+	auto dist =tr.norm();
+	cout<<"alfa "<<bState.alpha<<" beta "<<beta<<" distancia "<<dist<<endl;
+	if(beta > 0.1 || beta< -0.1){
+		differentialrobot_proxy->setSpeedBase(0,beta);
+		objetivo.full = true;
+	}
+	else{
+		objetivo.full = false;
+	}
+	if(objetivo.activate == true && objetivo.full == false){
+		if(ldata.front().dist < 200 && dist > ldata.front().dist)
+		{
+			obstaculo = true;
+
+		}
+		differentialrobot_proxy->setSpeedBase(1000,0);
+		if(dist < 1000){
+			differentialrobot_proxy->setSpeedBase(dist,0);
+		}
+		if(dist < 30){
+			objetivo.set_task_finished();
+			differentialrobot_proxy->setSpeedBase(0,0);
+		}	
+	}
+}
+void SpecificWorker::obstaculoEncontrado(RoboCompGenericBase::TBaseState bState)
+{
+	RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
+	auto r =std::min_element( ldata.begin(), ldata.begin()+5, [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return     a.dist < b.dist; });
+	cout<< "distancia :" <<r->dist<<endl;
+	cout<< "distancia a la recta :" <<algBug.DistanciaPuntoARecta(bState.x,bState.z)<<endl;
+	if(r->dist > 400){
+		differentialrobot_proxy->setSpeedBase(0,0.7);
+	}
+	else if(r->dist < 200){
+		differentialrobot_proxy->setSpeedBase(0,-0.7);
+	}
+	else{
+		differentialrobot_proxy->setSpeedBase(300,0);
+		if(algBug.DistanciaPuntoARecta(bState.x,bState.z)>40){
+			fueraRecta=true;
+		}
+		if(algBug.DistanciaPuntoARecta(bState.x,bState.z)<25 && fueraRecta==true){
+			obstaculo=false;
+			fueraRecta=false;
+		}
+	}
+}
 void SpecificWorker::compute()
 {
 	RoboCompGenericBase::TBaseState bState;
 	differentialrobot_proxy->getBaseState(bState);
-	//float rot;
 
 	if( auto target_o = objetivo.get(); target_o.has_value())
 	{
-		auto target = target_o.value();
-		Eigen:: Vector2f target2 (target.x,target.z);
-		Eigen:: Vector2f rw (bState.x,bState.z);
-		Eigen:: Matrix2f rot;
-		rot<<cos(bState.alpha),-sin(bState.alpha),sin(bState.alpha),cos(bState.alpha);
-		auto tr = rot*(target2-rw);
-		auto beta = atan2(tr[0],tr[1]);
-		auto dist =tr.norm();
-		cout<<"alfa "<<bState.alpha<<" beta "<<beta<<" distancia "<<dist<<endl;
-		differentialrobot_proxy->setSpeedBase(0,beta);
-		usleep(1000000);
-		int iteracciones=dist/1000;
-		for (int i = 0; i < iteracciones; i++){
-			differentialrobot_proxy->setSpeedBase(1000,0);
-			usleep(1000000);
-		}
-		differentialrobot_proxy->setSpeedBase(dist-iteracciones*1000,0);
-		usleep(1000000);
-		differentialrobot_proxy->setSpeedBase(0,0);
-		//me muevo
-		/*rot = atan2((target.x-bState.x),(target.z-bState.z));
-		printf("%f\n",rot);
-		if((CRX=(target.x-bState.x))==0 && (CRZ=(target.z-bState.z))==0){
-			objetivo.set_task_finished();
-		}
-		else{
-			if(click){
-				//cambio de direccion
-				differentialrobot_proxy->setSpeedBase(0,rot);
-				
-				int algo=0;
-			}
-			else{
-				//sigo
-				int algo=0;
-			}
-		}*/
-	}
+		if (!obstaculo){
+			auto target = target_o.value();
+			seguirPuntero(bState,target);
 
-	//computeCODE
-	//QMutexLocker locker(mutex);
-	//try
-	//{
-	//  camera_proxy->getYImage(0,img, cState, bState);
-	//  memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-	//  searchTags(image_gray);
-	//}
-	//catch(const Ice::Exception &e)
-	//{
-	//  std::cout << "Error reading from Camera" << e << std::endl;
-	//}
-	
-	
+		}
+		if(obstaculo){
+			obstaculoEncontrado(bState);
+			
+		}  		
+	}
 }
+
 
 int SpecificWorker::startup_check()
 {
@@ -148,8 +163,15 @@ void SpecificWorker::RCISMousePicker_setPick(RoboCompRCISMousePicker::Pick myPic
 	printf("X:%f ,Y:%f , Z:%f\n",myPick.x,myPick.y,myPick.z);
 	coordenada coor;
 	coor.x=myPick.x; coor.z=myPick.z;
+	algBug.xt=myPick.x;
+	algBug.zt=myPick.z;
+	RoboCompGenericBase::TBaseState bState;
+	differentialrobot_proxy->getBaseState(bState);
+	algBug.xr=bState.x;
+	algBug.zr=bState.z;
 	objetivo.put(coor);
 	click=true;
+	obstaculo=false;
 }
 
 
