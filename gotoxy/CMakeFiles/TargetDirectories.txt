@@ -1,0 +1,15 @@
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/install/strip.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/install/local.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/install.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/list_install_components.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/rebuild_cache.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/CMakeFiles/edit_cache.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/install/strip.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/install/local.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/edit_cache.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/gotoxy.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/install.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/list_install_components.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/rebuild_cache.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/ICES__home_salabeta_robotica-javi-nieto_gotoxy_src.dir
+/home/salabeta/robotica-javi-nieto/gotoxy/src/CMakeFiles/gotoxy_autogen.dir
