@@ -132,36 +132,56 @@ void SpecificWorker::compute()
     try { ldata = laser_proxy->getLaserData(); }
     catch (const Ice::Exception &e) { std::cout << e.what() << std::endl; }
 
+    std::vector<tupla> puntos;
+    std::vector<tupla> vecinos;
+    static Tpose target;
+    static Tpose targetParcial;
+    
     if (auto data = target_buffer.get(); data.has_value())
     {
         target = data.value();
+        auto &[x,y,z] = data.value();
         // calcular la función de navegación
-        //desde el target, avanzar con un fuego
+        //auto cell = grid_cell2(x,z);
+        compute_navigation_function( grid.get_cell2(x,z) );
+        //desde el target,
     }
     if( target_buffer.is_active())
     {
+
+        vecinos=neighboors2(grid.get_cell2(bState.x,bState.z));
+        vecinos=ordenarPorCasilla(vecinos,std::get<0>(target),std::get<1>(target),bState.rotV);
+        cout<<std::get<4>(vecinos.front())<<endl;
+        cout<<std::get<0>(vecinos.front())<<" "<<std::get<1>(vecinos.front())<<endl;
+        targetParcial={std::get<0>(vecinos.front()),0,std::get<1>(vecinos.front())};
+        puntos = dynamicWindowApproach(bState, ldata, targetParcial);
+        
+        if(grid.get_cell2(bState.x,bState.z).dist==0){
+            differentialrobot_proxy->setSpeedBase(0, 0);
+            target_buffer.set_task_finished();
+        }
         //preuntar si ha llegado
         //buscar el vecino más bajo en el grid
         //llamar a DWA con ese punto
     }
-    dynamicWindowApproach(bState, ldata);
+    if(not puntos.empty())
+        draw_things(bState, ldata, puntos, puntos.front());
  }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void SpecificWorker::dynamicWindowApproach(RoboCompGenericBase::TBaseState bState, RoboCompLaser::TLaserData &ldata) {
+std::vector<SpecificWorker::tupla> SpecificWorker::dynamicWindowApproach(RoboCompGenericBase::TBaseState bState, RoboCompLaser::TLaserData &ldata, const Tpose &target) {
     //coordenadas del target del mundo real al mundo del  robot
-    Eigen::Vector2f tr = transformar_targetRW(bState);
-
+    Eigen::Vector2f tr = transformar_targetRW(bState, target);
     //distancia que debe recorrer hasta el target
     auto dist = tr.norm();
     if (dist < 50)
     {
-        differentialrobot_proxy->setSpeedBase(0, 0);
-        target_buffer.set_task_finished();
-        std::cout << __FUNCTION__ << " At target" << std::endl;
-        return;
+        //differentialrobot_proxy->setSpeedBase(0, 0);
+        //target_buffer.set_task_finished();
+        //std::cout << __FUNCTION__ << " At target" << std::endl;
+        return {};
     }
     else
     {
@@ -183,17 +203,17 @@ void SpecificWorker::dynamicWindowApproach(RoboCompGenericBase::TBaseState bStat
             auto[x, y, v, w, alpha] = vectorOrdenado.front();
             std::cout << __FUNCTION__ << " " << x << " " << y << " " << v << " " << w << " " << alpha
                       << std::endl;
-            if (w > M_PI) w = M_PI;
-            if (w < -M_PI) w = -M_PI;
+            // if (w > M_PI) w = M_PI;
+            // if (w < -M_PI) w = -M_PI;
             if (v < 0) v = 0;
             try{  differentialrobot_proxy->setSpeedBase(std::min(v / 5, 1000.f), w); }
             catch (const Ice::Exception &e) { std::cout << e.what() << std::endl; }
-            draw_things(bState, ldata, vectorOrdenado, vectorOrdenado.front());
+            return vectorOrdenado;
         }
         else
         {
             std::cout << "Vector vacio" << std::endl;
-            return;
+            return {};
         }
     }
 }
@@ -203,12 +223,10 @@ void SpecificWorker::dynamicWindowApproach(RoboCompGenericBase::TBaseState bStat
 * @param bState
 * @return
 */
-Eigen::Vector2f SpecificWorker::transformar_targetRW(RoboCompGenericBase::TBaseState bState)
+Eigen::Vector2f SpecificWorker::transformar_targetRW(RoboCompGenericBase::TBaseState bState, const Tpose &target)
 {
-    // Coordenadas del target en el mundo real
-    auto[x, y, z] = target;
-
     //Target mundo real
+    auto &[x,y,z] = target;
     Eigen::Vector2f tw(x, z);
 
     // Robot mundo robot
@@ -364,6 +382,16 @@ void
 
         return vector;
     }
+    std::vector <SpecificWorker::tupla> SpecificWorker::ordenarPorCasilla(std::vector <tupla> vector, float x, float z, float rot) {
+        std::sort(vector.begin(), vector.end(), [x, z, rot](const auto &a, const auto &b) {
+            const auto &[ax, ay, ca, cw, aa] = a;
+            const auto &[bx, by, ba, bw, bb] = b;
+            return (aa*10+sqrt(((ax - x) * (ax - x) + (ay - z) * (ay - z)))*0.01+rot*0) < (bb*10+sqrt(((bx - x) * (bx - x) + (by - z) * (by - z)))*0.01+rot*0);
+        });
+        return vector;
+    }
+
+    
 
 ///////////___________________________________///////////////
     int SpecificWorker::startup_check() {
@@ -383,8 +411,6 @@ void
         std::cout << "x: " << myPick.x;
         std::cout << "..y: " << myPick.y;
         std::cout << "..z: " << myPick.z << std::endl;
-        compute_navigation_function(grid.get_cell((int)myPick.x,(int)myPick.z));
-        //grid.update();
     }
 
     void SpecificWorker::fill_grid_with_obstacles()
@@ -417,7 +443,9 @@ void
             }
         }
     }
-    void SpecificWorker::compute_navigation_function(MyGrid::Value v){
+ 
+    void SpecificWorker::compute_navigation_function(const MyGrid::Value &v)
+    {
         grid.reset_cell_distances();
         int dist=0;
         std::vector<MyGrid::Value> L1 = neighboors(v,dist);
@@ -437,16 +465,33 @@ void
             L2.clear();
         }
     }
-    std::vector<MyGrid::Value> SpecificWorker::neighboors(MyGrid::Value v, int dist){
+    std::vector<MyGrid::Value> SpecificWorker::neighboors(const  MyGrid::Value v, int dist){
         std::vector<std::tuple<int, int>> listaVecinos{ {-1,-1}, {0,-1}, {1,-1}, {-1,0}, {1,0}, {-1,1}, {0,1}, {-1,1} };
         std::vector<MyGrid::Value> valores;
         for (auto [dx,dy] : listaVecinos){
-            int x = v.cx + dx;
-            int y = v.cy + dy;
-            if(x >= 0 && y>=0 && x<grid.get_width() && y<grid.get_width() && grid.get_value(x,y)==false && grid.get_distance(x,y)==-1)
+            int x = v.k + dx;
+            int y = v.l + dy;
+            if(x >= 0 && y>=0 && x<grid.tam && y<grid.tam && grid.get_occupied(x,y)==false && grid.get_dist(x,y)==-1)
             {
-                grid.set_distance(x,y,dist);
+                
+                grid.set_dist(x,y,dist);
+                //grid.updateText(x,y);
+                grid.array[x][y].text_cell->setPlainText(QString::number(dist));
                 valores.insert(valores.end(),grid.get_cell(x,y));
+            }
+        }
+        return valores;
+    }
+    std::vector<SpecificWorker::tupla> SpecificWorker::neighboors2(const  MyGrid::Value v){
+        std::vector<std::tuple<int, int>> listaVecinos{ {-1,-1}, {0,-1}, {1,-1}, {-1,0}, {1,0}, {-1,1}, {0,1}, {-1,1} };
+        std::vector<SpecificWorker::tupla> valores;
+        for (auto [dx,dy] : listaVecinos){
+            int x = v.k + dx;
+            int y = v.l + dy;
+            if(x >= 0 && y>=0 && x<grid.tam && y<grid.tam && grid.get_occupied(x,y)==false && grid.get_dist(x,y)!=-1)
+            {
+                cout<<grid.array[x][y].cx<<" "<<grid.array[x][y].cy<<" "<<grid.array[x][y].k<<" "<<grid.array[x][y].l<<" "<<grid.array[x][y].dist<<endl;
+                valores.insert(valores.end(),{grid.array[x][y].cx, grid.array[x][y].cy, grid.array[x][y].k, grid.array[x][y].l, grid.array[x][y].dist});
             }
         }
         return valores;

@@ -10,8 +10,8 @@
 template<typename HMIN, HMIN hmin, typename WIDTH, WIDTH width, typename TILE, TILE tile>
 class Grid
 {
-    
     int w=width;
+    std::vector<std::tuple<int, int>> listaVecinos{ {-1,-1}, {0,-1}, {1,-1}, {-1,0}, {1,0}, {-1,1}, {0,1}, {-1,1} };
     public:
     int tam = 0;
         Grid()
@@ -25,7 +25,7 @@ class Grid
                 int l=0;
                 for (int j = hmin; j < width/2; j += tile, l++)
                 {                               
-                    array[k][l] = Value{false, nullptr,nullptr, i, j};
+                    array[k][l] = Value{false, nullptr,nullptr, i, j,k,l,-1};
                 }
             }
             tam = (int)(width/tile);
@@ -37,9 +37,10 @@ class Grid
             QGraphicsRectItem *paint_cell = nullptr;
             QGraphicsTextItem *text_cell = nullptr;
             int cx, cy;
-            int dist = -1; //dist vecinos
+            int k,l;
+            int dist; //dist vecinos
         };
-
+public:
         std::vector<std::vector<Value>> array;
 
         // void create_graphic_items(QGraphicsScene &scene)
@@ -87,13 +88,14 @@ class Grid
                 }
             }
         }
-        void update(){
-            for (int i = 0; i< tam; i++){
-                for (int j = 0; j< tam; j++){
-                    array[i][j].text_cell->setPlainText(QString::number(array[i][j].dist));
-                }
-            }
-        }
+
+        //void update(){
+        //    for (int i = 0; i< tam; i++){
+        //        for (int j = 0; j< tam; j++){
+        //            array[i][j].text_cell->setPlainText(QString::number(array[i][j].dist));
+        //        }
+        //    }
+       // }
     
     /*
  * Inicializamos el array a false, osea, no ocupades.
@@ -132,11 +134,15 @@ public:
        int i,j = 0;
        i = transformarX(x);
        j = transformarZ(z);
-       array[i][j].occupied = v;
-       if(v)
-       {
-           array[i][j].paint_cell->setBrush(QColor("Red"));
+       
+       if(i>=0 && j>=0 && i<tam && j<tam){
+            array[i][j].occupied = v;
+            if(v)
+            {
+                array[i][j].paint_cell->setBrush(QColor("Red"));
+            }
        }
+       
 
     }
     /**
@@ -152,7 +158,10 @@ public:
         int i,j = 0;
         i = transformarX(x);
         j = transformarZ(z);
-        return array[i][j].occupied;
+        if(i>=0 && j>=0 && i<tam && j<tam){
+            return array[i][j].occupied;
+        }
+        return {};
     }
     int get_distance(int x, int z){
         int i,j = 0;
@@ -164,14 +173,11 @@ public:
         int i,j = 0;
         i = transformarX(x);
         j = transformarZ(z);
-        array[i][j].dist=dist;
+        if(i>=0 && j>=0 && i<tam && j<tam){
+            array[i][j].dist=dist;
+        }
     }
-    Value get_cell(int x, int z){
-        int i,j = 0;
-        i = transformarX(x);
-        j = transformarZ(z);
-        return array[i][j];
-    }
+
     void pintarBordes()
     {
         for(int i = -width/2;i < width/2;i++)
@@ -189,8 +195,34 @@ public:
             }
         }
     }
-    
+    bool get_occupied(int k, int l){
+        return array[k][l].occupied;
+    }
+    int get_dist(int k, int l){
+        return array[k][l].dist;
+    }
+    void set_dist(int k, int l,int dist){
+        array[k][l].dist=dist;
+    }
+    Value get_cell(int k, int l){
+        return array[k][l];
+    }
+    Value get_cell2(int k, int l){
+        int i,j = 0;
+        i = transformarX(k);
+        j = transformarZ(l);
+        if(i>=0 && j>=0 && i<tam && j<tam){
+            return array[i][j];
+        }
+        return {};
+    }
+    void updateText(int k, int l)
+    {
+        qDebug() << "antes";
+        array[k][l].text_cell->setPlainText("0");
+        qDebug() << "después";
 
+    }
 };
 
 

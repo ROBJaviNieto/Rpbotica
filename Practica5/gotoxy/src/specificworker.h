@@ -37,8 +37,9 @@
 
 using namespace Eigen;
 using MyGrid=Grid<int, -2500, int, 5000, int, 100>;
-class SpecificWorker : public GenericWorker {
 
+class SpecificWorker : public GenericWorker {
+    Q_OBJECT
     template<typename T>
     struct Target {
         T data;
@@ -55,6 +56,7 @@ class SpecificWorker : public GenericWorker {
         std::optional<T> get() {
             std::lock_guard<std::mutex> guard(mutex);
             if (not empty){
+                empty = true;
                 return data;
             } else
                 return {};
@@ -91,15 +93,15 @@ private:
 
     //variable tipo Target con la tupla Tpose
     Target<Tpose> target_buffer;
-    Tpose target;
+    //Tpose target;
     using tupla = std::tuple<float, float, float, float, float>;
-    Eigen::Vector2f transformar_targetRW( RoboCompGenericBase::TBaseState bState);
+    Eigen::Vector2f transformar_targetRW( RoboCompGenericBase::TBaseState bState, const Tpose &target);
 
     //e4
     std::vector<tupla> calcularPuntos(float vOrigen,  float wOrigen);
     std::vector<tupla> ordenar(std::vector<tupla> vector, float x, float z);
     std::vector<tupla> obstaculos(std::vector<tupla> vector, float aph,const RoboCompLaser::TLaserData &ldata);
-    void dynamicWindowApproach(RoboCompGenericBase::TBaseState bState, RoboCompLaser::TLaserData &ldata);
+    std::vector<tupla>  dynamicWindowApproach(RoboCompGenericBase::TBaseState bState, RoboCompLaser::TLaserData &ldata,const Tpose &target);
 
     //draw
     QGraphicsScene scene;
@@ -110,10 +112,14 @@ private:
     void draw_things(const RoboCompGenericBase::TBaseState &bState, const RoboCompLaser::TLaserData &ldata, const std::vector<tupla> &puntos, const tupla &front);
     std::vector<QGraphicsEllipseItem*> arcs_vector;
     void fill_grid_with_obstacles();
-    std::vector<MyGrid::Value> neighboors(MyGrid::Value v, int dist);
-    void compute_navigation_function(MyGrid::Value v);
+    std::vector<MyGrid::Value> neighboors(const MyGrid::Value v, int dist);
+    void compute_navigation_function(const MyGrid::Value &v);
+    std::vector <tupla> ordenarPorCasilla(std::vector <tupla> vector, float x, float z, float rot);
+    std::vector<tupla> neighboors2(const  MyGrid::Value v);
+    
     //grid
     MyGrid grid;
+
 protected:
     void resizeEvent()
     {
